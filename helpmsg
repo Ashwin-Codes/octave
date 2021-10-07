@@ -1,0 +1,24 @@
+__**FUN COMMANDS**__
+**.greet** : _Bot will Greet You_
+**.gif `search Term`** : _Bot will Send a Random GIF_"
+
+__**MUSIC COMMANDS**__
+**.music play `url`** : _Bot will play the url_
+**.music add `url`** : _Bot will add the url to queue_
+**.music clear** : _Bot will clear the queue_
+**.music queue : **_Bot will print the queue_
+**.music stop** : _Bot will stop the Music_
+**.music skip** : _Bot will play the next song_
+**.music prev** : _Bot will play previous song_
+**.music goto** `num` : _Bot will play `num` song in queue_
+**.music seek** `sec` : _song will seek to `sec` seconds_
+**.music playlist** : _your playlist will be played_
+
+__**PLAYLIST COMMANDS**__
+**.playlist add `url`** : _`url` will add to your playlist_
+**.playlist show ** : _your playlist will print_
+**.playlist remove `num`** : _song on `num` will be removed_
+
+__**YOUTUBE SEARCH COMMANDS**__
+**.music search `search term`** : _yt search result will print_
+**.music s `num`** : _song on `num` on search result will be added to queue_

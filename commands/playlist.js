@@ -1,59 +1,65 @@
-const fs = require("fs");
+// REFERENCE TO INFORMATION FOR HOW TO PERFORM
+// CRUD OPERATIONS IN FIREBASE REALTIME DATABASE :
+// https://firebase.google.com/docs/reference/rest/database
+
 const ytdl = require("ytdl-core");
+
+const getPlaylist = require("../utilities/playlist/getPlaylist");
+const setPlaylist = require("../utilities/playlist/setPlaylist");
+const removeFromPlaylist = require("../utilities/playlist/removeFromPlaylist");
 const message = require("../utilities/message");
-const linkToTitle = require("../utilities/linkToTitle");
-const removeUrlFromFile = require("../utilities/removeUrlFromFile");
-const videoTitle = require("../utilities/videoTitle");
 
-module.exports = function (msg, tokens) {
-	let path = `./playlist/${msg.author.id}.txt`;
+const getVideoInfo = require("../utilities/getVideoInfo");
 
-	if (fs.existsSync(path)) {
-		console.log(`Playlist for user ${msg.author.id} exists.`);
-	} else {
-		fs.writeFile(path, "", (err) => {
-			if (err) {
-				console.log(err);
-			} else {
-				console.log(
-					`Playlist file for user ${msg.author.id} created Successfully.`
-				);
-			}
-		});
-	}
+module.exports = async function (msg, tokens) {
 	switch (tokens[0]) {
 		case "add":
-			if (ytdl.validateURL(tokens[1])) {
-				fs.appendFile(path, `${tokens[1]}\n`, (err) => {
-					if (err) {
-						console.log(err);
-						message(
-							msg,
-							"Cannot Complete The request. Try Again !"
-						);
-					} else {
-						videoTitle(tokens[1], message, msg);
-					}
-				});
-			} else {
-				message(msg, "Please give me valid url without line break!");
+			const songUrl = tokens[1];
+			if (!ytdl.validateURL(songUrl)) {
+				message(msg, "Please give me a valid url.");
+				return;
 			}
-			break;
-		case "show":
-			message(msg, "Reading Files...");
-			fs.readFile(path, "utf8", function (err, text) {
-				if (err) {
-					console.log(err);
-				} else {
-					linkToTitle(text, message, msg, "PLAYLIST : \n"); //msg obj is required for "message" function
+			// responseHandler is a callback function for setPlaylist function.
+			async function responseHandler(response) {
+				if (!response.data.name) {
+					message(msg, "something went wrong.");
+					return;
 				}
-			});
+				let videoInfo = await getVideoInfo(songUrl);
+				message(msg, `'${videoInfo.title}' **added to your playlist.**`);
+			}
+			setPlaylist(msg, songUrl, responseHandler);
 			break;
+
+		case "show":
+			//Longer the playlist longer playlistMessageHandler will take.
+			message(msg, "Reading Your Playlist...");
+
+			//playlistMessageHandler takes a playlist object => gets title for each song => sends a message with all song title combined to user.
+			async function playlistMessageHandler(playlist) {
+				let messageText = "";
+				let index = 0; // using index variable for listing.
+				for (const i in playlist) {
+					const songUrl = playlist[i];
+					const songInfo = await getVideoInfo(songUrl);
+					const songTitle = songInfo.title;
+					index++;
+
+					messageText = messageText.concat(`**${index})** ${songTitle}\n`);
+				}
+				message(msg, messageText);
+			}
+			//getPlaylist sends an object like {ID : "Song Url", ID2 : "Song Url"}
+			const playlist = await getPlaylist(msg);
+			playlistMessageHandler(playlist);
+			break;
+
 		case "remove":
-			removeUrlFromFile(path, tokens[1], message, msg);
+			removeFromPlaylist(msg, tokens[1]);
 			break;
+
 		default:
-			message(msg, "Enter a Valid Command !");
+			message(msg, "Please give me a valid command.");
 			break;
 	}
 };

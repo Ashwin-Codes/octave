@@ -2,6 +2,7 @@ const fs = require("fs");
 const ytdl = require("ytdl-core");
 const yts = require("yt-search");
 const linkToTitle = require("../utilities/linkToTitle");
+const getPlaylist = require("../utilities/playlist/getPlaylist");
 
 let songs = [];
 let songIndex = 0;
@@ -113,7 +114,7 @@ async function playYTSong(msg, tokens, voiceChannel) {
 	}
 }
 
-module.exports = function (msg, tokens) {
+module.exports = async function (msg, tokens) {
 	let voiceChannel = msg.member.voice.channel;
 	// Checking if user have joined a voice channel
 	if (voiceChannel == null) {
@@ -190,21 +191,29 @@ module.exports = function (msg, tokens) {
 				playYTSong(msg, tokens, voiceChannel);
 				break;
 			case "playlist":
-				let path = `./playlist/${msg.author.id}.txt`;
-				fs.readFile(path, "utf8", function (err, text) {
-					if (err) {
-						message(msg, "Playlist not found..");
-					} else {
-						let textArray = text.split("\n").filter((ele) => {
-							if (!ele == " ") {
-								return ele;
-							}
-						});
-						songs = textArray;
-						songIndex = 0;
-						play(voiceChannel, msg);
-					}
-				});
+				// let path = `./playlist/${msg.author.id}.txt`;
+				// fs.readFile(path, "utf8", function (err, text) {
+				// 	if (err) {
+				// 		message(msg, "Playlist not found..");
+				// 	} else {
+				// 		let textArray = text.split("\n").filter((ele) => {
+				// 			if (!ele == " ") {
+				// 				return ele;
+				// 			}
+				// 		});
+				// 		songs = textArray;
+				// 		songIndex = 0;
+				// 		play(voiceChannel, msg);
+				// 	}
+				// });
+				const playlistArray = [];
+				const playlist = await getPlaylist(msg);
+				for (const i in playlist) {
+					playlistArray.push(playlist[i]);
+				}
+				songs = playlistArray;
+				songIndex = 0;
+				play(voiceChannel, msg);
 				break;
 			case "goto":
 				let i = tokens[1] - 1;

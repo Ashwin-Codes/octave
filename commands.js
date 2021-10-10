@@ -19,11 +19,6 @@ module.exports = async function (msg) {
 		}
 	});
 
-	// if (tokens.length > 0) {
-	// 	console.log("tokens : ", tokens);
-	// }
-	//uncomment above code if you want to log all the commands.
-
 	let command = tokens.shift();
 	if (command) {
 		if (command.charAt(0) === ".") {

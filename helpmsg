@@ -15,7 +15,7 @@ __**MUSIC COMMANDS**__
 **.music playlist** : _your playlist will be played_
 
 __**PLAYLIST COMMANDS**__
-**.playlist add `url`** : _`url` will add to your playlist_
+**.playlist add `url`** : _`url` will be added to your playlist_
 **.playlist show ** : _your playlist will print_
 **.playlist remove `num`** : _song on `num` will be removed_
 
